@@ -111,7 +111,9 @@
 }
 
 .qn-widget-container.active .qn-panel-iframe {
-  display: block;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .qn-widget-container.active .qn-close-btn {
