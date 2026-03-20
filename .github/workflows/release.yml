@@ -17,12 +17,16 @@ jobs:
 
       - name: Create ZIP
         run: |
-          zip -r quick-notes-${{ github.ref_name }}.zip manifest.json popup.html popup.css popup.js background.js content.js content.css icons/ README.md CHANGELOG.md
+          zip -r quick-notes-${{ github.ref_name }}.zip manifest.json popup.html css/ js/ assets/ README.md CHANGELOG.md
+
+      - name: Extract latest changelog
+        run: |
+          python3 -c "import sys; content = open('CHANGELOG.md').read(); print(content.split('## [')[1].split('\n', 1)[1].strip())" > release_notes.md
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           files: quick-notes-${{ github.ref_name }}.zip
-          body_path: CHANGELOG.md
+          body_path: release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
