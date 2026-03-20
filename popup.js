@@ -56,6 +56,7 @@ function createNoteCard(note) {
       </div>
       <div class="${contentClass}">${escapeHtml(note.content)}</div>
       <div class="card-actions">
+        ${note.type === 'link' ? `<button class="action-btn open-link" data-url="${escapeHtml(note.content)}">打开</button>` : ''}
         ${note.type === 'code' ? `<button class="action-btn format" data-id="${note.id}">格式化</button>` : ''}
         <button class="action-btn copy" data-id="${note.id}">复制</button>
         <button class="action-btn delete" data-id="${note.id}">删除</button>
@@ -69,10 +70,12 @@ async function saveNote() {
   const newNote = {
     id: Date.now().toString(),
     type: noteType.value,
-    title: noteTitle.value,
-    content: noteContent.value,
+    title: noteTitle.value.trim() || (noteType.value === 'link' ? '未命名链接' : '便签'),
+    content: noteContent.value.trim(),
     timestamp: new Date().toISOString()
   };
+
+  if (!newNote.content) return;
 
   if (newNote.type === 'code') {
     newNote.content = formatCode(newNote.content);
@@ -141,6 +144,13 @@ function attachCardEvents() {
         chrome.storage.local.set({ [STORAGE_KEY]: notes });
         renderNotes();
       }
+    };
+  });
+
+  document.querySelectorAll('.action-btn.open-link').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      chrome.runtime.sendMessage({ action: 'openLink', url: btn.dataset.url });
     };
   });
 }
