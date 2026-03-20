@@ -7,6 +7,9 @@ import {
   Layout,
   Github,
   Globe,
+  ArrowLeft,
+  Puzzle,
+  Settings,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation, LanguageProvider } from "./i18n";
@@ -123,61 +126,13 @@ const LanguageSelector = () => {
   );
 };
 
-function Main() {
-  const { t, lang } = useTranslation();
+function HomeView({ setView }) {
+  const { t } = useTranslation();
   const versions =
     typeof __APP_CHANGELOG__ !== "undefined" ? __APP_CHANGELOG__ : [];
 
   return (
-    <div className="min-h-screen">
-      <div className="bg-grid" />
-
-      {/* Header */}
-      <nav
-        className="container"
-        style={{
-          padding: "30px 0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
-          <img
-            src="/icons/icon48.png"
-            className="animate-float"
-            alt="Logo"
-            width="40"
-            height="40"
-          />
-          <span
-            className="pixel-font"
-            style={{
-              fontSize: "22px",
-              color: "var(--primary)",
-              textShadow: "3px 3px 0px #000",
-            }}
-          >
-            BitMemo
-          </span>
-        </div>
-        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-          <LanguageSelector />
-          <a
-            href="https://github.com/LZ7TOP/BitMemo"
-            className="pixel-btn secondary"
-            style={{
-              fontSize: "10px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <Github size={14} /> {t("nav_github")}
-          </a>
-        </div>
-      </nav>
-
+    <>
       {/* Hero */}
       <section
         className="container"
@@ -238,6 +193,7 @@ function Main() {
               {t("btn_download")} (v{__APP_VERSION__})
             </a>
             <button
+              onClick={() => setView("tutorial")}
               className="pixel-btn secondary"
               style={{ fontSize: "18px", padding: "16px 32px" }}
             >
@@ -501,6 +457,182 @@ function Main() {
           </div>
         </div>
       </section>
+    </>
+  );
+}
+
+function TutorialView({ setView }) {
+  const { t } = useTranslation();
+
+  const steps = [
+    {
+      icon: Download,
+      title: t("tutorial_step_1_title"),
+      desc: t("tutorial_step_1_desc"),
+    },
+    {
+      icon: Puzzle,
+      title: t("tutorial_step_2_title"),
+      desc: t("tutorial_step_2_desc"),
+    },
+    {
+      icon: MousePointer2,
+      title: t("tutorial_step_3_title"),
+      desc: t("tutorial_step_3_desc"),
+    },
+    {
+      icon: Settings,
+      title: t("tutorial_step_4_title"),
+      desc: t("tutorial_step_4_desc"),
+    },
+  ];
+
+  return (
+    <section className="container" style={{ padding: "80px 0" }}>
+      <button
+        onClick={() => setView("home")}
+        className="pixel-btn"
+        style={{ marginBottom: "60px", fontSize: "12px" }}
+      >
+        <ArrowLeft size={16} /> {t("btn_back")}
+      </button>
+
+      <h2
+        className="pixel-font"
+        style={{
+          textAlign: "center",
+          marginBottom: "80px",
+          fontSize: "2rem",
+          color: "var(--primary)",
+        }}
+      >
+        {t("tutorial_title")}
+      </h2>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "60px",
+          maxWidth: "800px",
+          margin: "0 auto",
+        }}
+      >
+        {steps.map((step, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="pixel-box"
+            style={{ display: "flex", gap: "30px", alignItems: "flex-start" }}
+          >
+            <div
+              style={{
+                background: "var(--bg)",
+                padding: "20px",
+                border: "4px solid var(--primary)",
+                boxShadow: "6px 6px 0px var(--primary)",
+                flexShrink: 0,
+              }}
+            >
+              <step.icon size={40} color="var(--primary)" />
+            </div>
+            <div>
+              <h3
+                className="pixel-font"
+                style={{ fontSize: "1.2rem", marginBottom: "16px" }}
+              >
+                {step.title}
+              </h3>
+              <p style={{ color: "var(--text-dim)", lineHeight: "1.8" }}>
+                {step.desc}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Main() {
+  const { t } = useTranslation();
+  const [view, setView] = useState("home");
+
+  return (
+    <div className="min-h-screen">
+      <div className="bg-grid" />
+
+      {/* Header */}
+      <nav
+        className="container"
+        style={{
+          padding: "30px 0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div
+          onClick={() => setView("home")}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "15px",
+            cursor: "pointer",
+          }}
+        >
+          <img
+            src="/icons/icon48.png"
+            className="animate-float"
+            alt="Logo"
+            width="40"
+            height="40"
+          />
+          <span
+            className="pixel-font"
+            style={{
+              fontSize: "22px",
+              color: "var(--primary)",
+              textShadow: "3px 3px 0px #000",
+            }}
+          >
+            BitMemo
+          </span>
+        </div>
+        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
+          <LanguageSelector />
+          <a
+            href="https://github.com/LZ7TOP/BitMemo"
+            className="pixel-btn secondary"
+            style={{
+              fontSize: "10px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <Github size={14} /> {t("nav_github")}
+          </a>
+        </div>
+      </nav>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={view}
+          initial={{ opacity: 0, x: view === "home" ? -20 : 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: view === "home" ? 20 : -20 }}
+          transition={{ duration: 0.2 }}
+        >
+          {view === "home" ? (
+            <HomeView setView={setView} />
+          ) : (
+            <TutorialView setView={setView} />
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Footer */}
       <footer
