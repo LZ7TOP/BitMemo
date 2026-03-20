@@ -28,8 +28,13 @@ const selectTrigger = customTypeSelect.querySelector('.select-trigger');
 const selectedTypeText = document.getElementById('selectedTypeText');
 const selectOptions = customTypeSelect.querySelectorAll('.select-option');
 
+// Language Selector Elements
+const langSelector = document.getElementById('langSelector');
+const langOptions = document.querySelectorAll('.lang-option');
+
 // Initialize
 async function init() {
+  await initI18n();
   const data = await chrome.storage.local.get([STORAGE_KEY, SETTINGS_KEY]);
   notes = data[STORAGE_KEY] || [];
   
@@ -53,29 +58,33 @@ function renderNotes() {
 
   notesList.innerHTML = filteredNotes.length > 0 
     ? filteredNotes.map(note => createNoteCard(note)).join('')
-    : `<div style="text-align: center; color: var(--text-muted); margin-top: 50px;">暂无记录</div>`;
+    : `<div style="text-align: center; color: var(--text-muted); margin-top: 50px;">${window.i18n.t('no_data')}</div>`;
 
   // Attach event listeners to dynamic elements
   attachCardEvents();
 }
 
 function createNoteCard(note) {
-  const typeLabels = { text: '文本', link: '链接', code: '代码' };
+  const typeLabels = { 
+    text: window.i18n.t('tab_text'), 
+    link: window.i18n.t('tab_link'), 
+    code: window.i18n.t('tab_code') 
+  };
   const contentClass = note.type === 'code' ? 'note-content code' : 'note-content';
   
   return `
     <div class="note-card" data-id="${note.id}">
       <div class="note-header">
-        <div class="note-title">${note.title || '无标题'}</div>
+        <div class="note-title">${note.title || (note.type === 'link' ? window.i18n.t('modal_title_add') : window.i18n.t('tab_text'))}</div>
         <div class="note-type-icon">${typeLabels[note.type]}</div>
       </div>
       <div class="${contentClass}">${escapeHtml(note.content)}</div>
       <div class="card-actions">
-        ${note.type === 'link' ? `<button class="action-btn open-link" data-url="${escapeHtml(note.content)}">打开</button>` : ''}
-        ${note.type === 'code' ? `<button class="action-btn format" data-id="${note.id}">格式化</button>` : ''}
-        <button class="action-btn edit" data-id="${note.id}">编辑</button>
-        <button class="action-btn copy" data-id="${note.id}">复制</button>
-        <button class="action-btn delete" data-id="${note.id}">删除</button>
+        ${note.type === 'link' ? `<button class="action-btn open-link" data-url="${escapeHtml(note.content)}">${window.i18n.t('btn_open')}</button>` : ''}
+        ${note.type === 'code' ? `<button class="action-btn format" data-id="${note.id}">${window.i18n.t('btn_format')}</button>` : ''}
+        <button class="action-btn edit" data-id="${note.id}">${window.i18n.t('btn_edit')}</button>
+        <button class="action-btn copy" data-id="${note.id}">${window.i18n.t('btn_copy')}</button>
+        <button class="action-btn delete" data-id="${note.id}">${window.i18n.t('btn_delete')}</button>
       </div>
     </div>
   `;
@@ -209,14 +218,18 @@ function closeModal() {
   noteTitle.value = '';
   noteContent.value = '';
   editingId = null;
-  modalTitle.textContent = '新建便签';
+  modalTitle.textContent = window.i18n.t('modal_title_add');
   updateSelectedType('text'); // Reset to default
   customTypeSelect.classList.remove('active');
 }
 
 function updateSelectedType(value) {
   noteType.value = value;
-  const labels = { text: '纯文本', link: '网页链接', code: '代码片段' };
+  const labels = { 
+    text: window.i18n.t('type_text'), 
+    link: window.i18n.t('type_link'), 
+    code: window.i18n.t('type_code') 
+  };
   selectedTypeText.textContent = labels[value];
   
   selectOptions.forEach(opt => {
@@ -227,6 +240,18 @@ function updateSelectedType(value) {
     }
   });
 }
+
+// Language Selector Logic
+langOptions.forEach(opt => {
+  opt.onclick = (e) => {
+    e.stopPropagation();
+    window.setLanguage(opt.dataset.lang);
+  };
+});
+
+window.addEventListener('langChanged', () => {
+  renderNotes(); // Re-render to update dynamic labels
+});
 
 // Custom Select Interaction
 selectTrigger.onclick = (e) => {
@@ -251,7 +276,7 @@ function editNote(id) {
   if (!note) return;
 
   editingId = id;
-  modalTitle.textContent = '编辑便签';
+  modalTitle.textContent = window.i18n.t('modal_title_edit');
   updateSelectedType(note.type);
   noteTitle.value = note.title;
   noteContent.value = note.content;

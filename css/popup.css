@@ -102,6 +102,50 @@ h1 {
   transform: translate(1px, 1px);
 }
 
+/* Language Selector */
+.lang-selector {
+  position: relative;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.lang-current {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lang-options {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--card-bg);
+  border: 3px solid var(--border);
+  min-width: 100px;
+  z-index: 200;
+  display: none;
+  box-shadow: 4px 4px 0px #000;
+  margin-top: 5px;
+}
+
+.lang-selector:hover .lang-options {
+  display: block;
+}
+
+.lang-option {
+  padding: 8px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: all 0.1s;
+}
+
+.lang-option:hover {
+  background: var(--primary);
+  color: #000;
+}
+
 .settings-toggle {
   font-size: 11px;
 }

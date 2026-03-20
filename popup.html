@@ -3,37 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BitMemo</title>
+  <title data-i18n="app_name">BitMemo</title>
   <link rel="stylesheet" href="css/popup.css">
+  <!-- Language Configurations -->
+  <script src="assets/lang/zh.js"></script>
+  <script src="assets/lang/zh_tw.js"></script>
+  <script src="assets/lang/en.js"></script>
+  <script src="assets/lang/ja.js"></script>
+  <script src="assets/lang/ko.js"></script>
+  <script src="js/i18n.js"></script>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="header-top">
         <div class="header-left">
-          <h1>BitMemo <span class="badge">LZ7</span></h1>
+          <h1 data-i18n="app_name">BitMemo <span class="badge" data-i18n="badge_lz7">LZ7</span></h1>
           <a href="https://github.com/LZ7TOP/BitMemo" target="_blank" class="github-link" title="GitHub">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.041-1.416-4.041-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.744.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
           </a>
+          <div class="lang-selector" id="langSelector">
+            <span class="lang-current" id="currentLangIcon">🌐</span>
+            <div class="lang-options">
+              <div class="lang-option" data-lang="zh" data-i18n="lang_zh">简体中文</div>
+              <div class="lang-option" data-lang="zh_tw" data-i18n="lang_zh_tw">繁体中文</div>
+              <div class="lang-option" data-lang="en" data-i18n="lang_en">English</div>
+              <div class="lang-option" data-lang="ja" data-i18n="lang_ja">日本語</div>
+              <div class="lang-option" data-lang="ko" data-i18n="lang_ko">한국어</div>
+            </div>
+          </div>
         </div>
         <div class="settings-toggle">
           <label>
             <input type="checkbox" id="showWidgetToggle" checked>
             <span class="pixel-toggle"></span>
-            悬浮窗
+            <span data-i18n="tag_widget_toggle">悬浮窗</span>
           </label>
         </div>
       </div>
       <div class="search-box">
-        <input type="text" id="searchInput" placeholder="搜索便签...">
+        <input type="text" id="searchInput" placeholder="搜索便签..." data-i18n="search_placeholder">
       </div>
     </header>
 
     <div class="tabs">
-      <button class="tab-btn active" data-tab="all">全部</button>
-      <button class="tab-btn" data-tab="text">文本</button>
-      <button class="tab-btn" data-tab="link">链接</button>
-      <button class="tab-btn" data-tab="code">代码</button>
+      <button class="tab-btn active" data-tab="all" data-i18n="tab_all">全部</button>
+      <button class="tab-btn" data-tab="text" data-i18n="tab_text">文本</button>
+      <button class="tab-btn" data-tab="link" data-i18n="tab_link">链接</button>
+      <button class="tab-btn" data-tab="code" data-i18n="tab_code">代码</button>
     </div>
 
     <main id="notesList">
@@ -41,39 +58,39 @@
     </main>
 
     <footer>
-      <button id="addBtn" class="primary-btn">+ 新建便签</button>
+      <button id="addBtn" class="primary-btn" data-i18n="btn_add">+ 新建便签</button>
     </footer>
 
     <!-- Add Note Modal -->
     <div id="noteModal" class="modal">
       <div class="modal-content">
-        <h2 id="modalTitle">新建便签</h2>
+        <h2 id="modalTitle" data-i18n="modal_title_add">新建便签</h2>
         <div class="form-group">
-          <label>类型</label>
+          <label data-i18n="label_type">类型</label>
           <div class="custom-select" id="customTypeSelect">
             <div class="select-trigger">
-              <span id="selectedTypeText">纯文本</span>
+              <span id="selectedTypeText" data-i18n="type_text">纯文本</span>
               <span class="select-arrow"></span>
             </div>
             <div class="select-options">
-              <div class="select-option active" data-value="text">纯文本</div>
-              <div class="select-option" data-value="link">网页链接</div>
-              <div class="select-option" data-value="code">代码片段</div>
+              <div class="select-option active" data-value="text" data-i18n="type_text">纯文本</div>
+              <div class="select-option" data-value="link" data-i18n="type_link">网页链接</div>
+              <div class="select-option" data-value="code" data-i18n="type_code">代码片段</div>
             </div>
           </div>
           <input type="hidden" id="noteType" value="text">
         </div>
         <div class="form-group">
-          <label for="noteTitle">标题</label>
-          <input type="text" id="noteTitle" placeholder="输入标题...">
+          <label data-i18n="label_title">标题</label>
+          <input type="text" id="noteTitle" placeholder="输入标题..." data-i18n="placeholder_title">
         </div>
         <div class="form-group">
-          <label for="noteContent">内容</label>
-          <textarea id="noteContent" rows="8" placeholder="输入记录的内容..."></textarea>
+          <label data-i18n="label_content">内容</label>
+          <textarea id="noteContent" rows="8" placeholder="输入记录的内容..." data-i18n="placeholder_content"></textarea>
         </div>
         <div class="modal-actions">
-          <button id="cancelBtn" class="secondary-btn">取消</button>
-          <button id="saveBtn" class="primary-btn">保存</button>
+          <button id="cancelBtn" class="secondary-btn" data-i18n="btn_cancel">取消</button>
+          <button id="saveBtn" class="primary-btn" data-i18n="btn_save">保存</button>
         </div>
       </div>
     </div>

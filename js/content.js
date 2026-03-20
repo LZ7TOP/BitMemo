@@ -7,6 +7,8 @@
   const iframe = document.createElement('iframe');
   iframe.className = 'qn-panel-iframe';
   iframe.src = chrome.runtime.getURL('popup.html');
+  iframe.allow = "clipboard-write";
+  iframe.style.border = 'none';
   
   const btn = document.createElement('div');
   btn.className = 'qn-floating-btn';
