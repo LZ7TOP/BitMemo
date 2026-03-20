@@ -1,0 +1,47 @@
+/* Content Script Specific Styles (reset and minimal) */
+.qn-widget-container {
+  position: fixed;
+  z-index: 999999;
+  bottom: 20px;
+  right: 20px;
+  cursor: move;
+  user-select: none;
+}
+
+.qn-floating-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #00c1ff;
+  box-shadow: 0 4px 15px rgba(0, 193, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.qn-floating-btn:hover {
+  transform: scale(1.1);
+}
+
+.qn-floating-btn img {
+  width: 24px;
+  height: 24px;
+}
+
+.qn-panel-iframe {
+  display: none;
+  width: 400px;
+  height: 550px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  background: transparent;
+  margin-bottom: 10px;
+}
+
+.qn-widget-container.active .qn-panel-iframe {
+  display: block;
+}
