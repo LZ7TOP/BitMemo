@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Notes</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Quick Notes <span class="badge">LZ7</span></h1>
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="搜索便签...">
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="all">全部</button>
+      <button class="tab-btn" data-tab="text">文本</button>
+      <button class="tab-btn" data-tab="link">链接</button>
+      <button class="tab-btn" data-tab="code">代码</button>
+    </div>
+
+    <main id="notesList">
+      <!-- Notes will be injected here -->
+    </main>
+
+    <footer>
+      <button id="addBtn" class="primary-btn">+ 新建便签</button>
+    </footer>
+
+    <!-- Add Note Modal -->
+    <div id="noteModal" class="modal">
+      <div class="modal-content">
+        <h2>新建便签</h2>
+        <div class="form-group">
+          <label for="noteType">类型</label>
+          <select id="noteType">
+            <option value="text">纯文本</option>
+            <option value="link">网页链接</option>
+            <option value="code">代码片段</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="noteTitle">标题</label>
+          <input type="text" id="noteTitle" placeholder="输入标题...">
+        </div>
+        <div class="form-group">
+          <label for="noteContent">内容</label>
+          <textarea id="noteContent" rows="8" placeholder="输入记录的内容..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button id="cancelBtn" class="secondary-btn">取消</button>
+          <button id="saveBtn" class="primary-btn">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
