@@ -6,6 +6,11 @@
   right: 20px;
   cursor: move;
   user-select: none;
+  display: block;
+}
+
+.qn-widget-container.hidden {
+  display: none !important;
 }
 
 .qn-floating-btn {
@@ -36,8 +41,6 @@
 .qn-close-btn {
   display: none;
   position: absolute;
-  top: -15px;
-  right: -15px;
   width: 32px;
   height: 32px;
   background: #ff4d4d;
@@ -53,7 +56,13 @@
   z-index: 1000;
   line-height: 1;
   padding-bottom: 2px;
+  transition: all 0.1s;
 }
+
+.qn-close-btn.pos-top-right { top: -15px; right: -15px; }
+.qn-close-btn.pos-top-left { top: -15px; left: -15px; }
+.qn-close-btn.pos-bottom-right { bottom: -15px; right: -15px; }
+.qn-close-btn.pos-bottom-left { bottom: -15px; left: -15px; }
 
 .qn-close-btn:hover {
   transform: translate(2px, 2px);
@@ -71,7 +80,7 @@
 }
 
 .qn-panel-iframe {
-  display: none;
+  display: block;
   position: absolute;
   width: 400px;
   height: 550px;
@@ -79,6 +88,10 @@
   border-radius: 0;
   box-shadow: 8px 8px 0px #000;
   background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
 }
 
 .qn-panel-iframe.pos-top {

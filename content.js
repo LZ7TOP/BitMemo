@@ -1,5 +1,6 @@
 // Floating Widget Logic
 (function() {
+  const SETTINGS_KEY = 'quick_notes_settings_lz7';
   const container = document.createElement('div');
   container.className = 'qn-widget-container';
   
@@ -22,6 +23,21 @@
   container.appendChild(btn);
   container.appendChild(closeBtn);
   document.body.appendChild(container);
+
+  // Sync visibility with settings
+  chrome.storage.local.get(SETTINGS_KEY, (data) => {
+    const settings = data[SETTINGS_KEY] || { showWidget: true };
+    if (!settings.showWidget) {
+      container.classList.add('hidden');
+    }
+  });
+
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes[SETTINGS_KEY]) {
+      const newValue = changes[SETTINGS_KEY].newValue || { showWidget: true };
+      container.classList.toggle('hidden', !newValue.showWidget);
+    }
+  });
 
   // Toggle panel (Double Click only)
   btn.addEventListener('dblclick', (e) => {
@@ -46,20 +62,34 @@
 
     // Reset classes
     iframe.classList.remove('pos-top', 'pos-bottom', 'pos-left', 'pos-right');
+    closeBtn.classList.remove('pos-top-right', 'pos-top-left', 'pos-bottom-right', 'pos-bottom-left');
+
+    let isTop = false;
+    let isLeft = false;
 
     // Vertical position
     if (btnRect.top > viewportHeight / 2) {
       iframe.classList.add('pos-top');
+      isTop = true;
     } else {
       iframe.classList.add('pos-bottom');
+      isTop = false;
     }
 
     // Horizontal position
     if (btnRect.left > viewportWidth / 2) {
       iframe.classList.add('pos-left');
+      isLeft = true;
     } else {
       iframe.classList.add('pos-right');
+      isLeft = false;
     }
+
+    // Position close button at the corner furthest from the floating button
+    if (isTop && isLeft) closeBtn.classList.add('pos-top-left');
+    else if (isTop && !isLeft) closeBtn.classList.add('pos-top-right');
+    else if (!isTop && isLeft) closeBtn.classList.add('pos-bottom-left');
+    else closeBtn.classList.add('pos-bottom-right');
   }
 
   // Close button logic

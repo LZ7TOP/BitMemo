@@ -1,5 +1,6 @@
 // Storage key
 const STORAGE_KEY = 'quick_notes_lz7';
+const SETTINGS_KEY = 'quick_notes_settings_lz7';
 
 // State
 let notes = [];
@@ -19,11 +20,17 @@ const modalTitle = document.getElementById('modalTitle');
 const noteType = document.getElementById('noteType');
 const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
+const showWidgetToggle = document.getElementById('showWidgetToggle');
 
 // Initialize
 async function init() {
-  const data = await chrome.storage.local.get(STORAGE_KEY);
+  const data = await chrome.storage.local.get([STORAGE_KEY, SETTINGS_KEY]);
   notes = data[STORAGE_KEY] || [];
+  
+  // Load settings
+  const settings = data[SETTINGS_KEY] || { showWidget: true };
+  showWidgetToggle.checked = settings.showWidget;
+  
   renderNotes();
 }
 
@@ -218,6 +225,13 @@ function escapeHtml(text) {
   div.textContent = text;
   return div.innerHTML;
 }
+
+// Settings
+showWidgetToggle.onchange = async () => {
+  await chrome.storage.local.set({ 
+    [SETTINGS_KEY]: { showWidget: showWidgetToggle.checked } 
+  });
+};
 
 // Start
 init();
