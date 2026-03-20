@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Quick Notes",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "快捷便签 - 浮动窗口，随处记录，一键链接",
   "permissions": ["storage", "tabs"],
   "action": {
@@ -13,18 +13,18 @@
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "js/background.js"
   },
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "css": ["content.css"]
+      "js": ["js/content.js"],
+      "css": ["css/content.css"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["icons/*", "popup.html", "popup.css", "popup.js"],
+      "resources": ["assets/icons/*.png", "assets/fonts/*.ttf", "popup.html"],
       "matches": ["<all_urls>"]
     }
   ],

@@ -11,7 +11,7 @@
   const btn = document.createElement('div');
   btn.className = 'qn-floating-btn';
   const icon = document.createElement('img');
-  icon.src = chrome.runtime.getURL('icons/icon48.png');
+  icon.src = chrome.runtime.getURL('assets/icons/icon48.png');
   btn.appendChild(icon);
   
   const closeBtn = document.createElement('div');
