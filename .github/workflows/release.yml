@@ -17,7 +17,7 @@ jobs:
 
       - name: Create ZIP
         run: |
-          zip -r quick-notes-${{ github.ref_name }}.zip manifest.json popup.html css/ js/ assets/ README.md CHANGELOG.md
+          zip -r BitMemo-${{ github.ref_name }}.zip manifest.json popup.html css/ js/ assets/ README.md CHANGELOG.md
 
       - name: Extract latest changelog
         run: |
@@ -26,7 +26,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: quick-notes-${{ github.ref_name }}.zip
+          files: BitMemo-${{ github.ref_name }}.zip
           body_path: release_notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
