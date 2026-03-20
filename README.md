@@ -29,6 +29,7 @@
 您可以在项目的 [Releases](https://github.com/LZ7TOP/quick-notes/releases) 页面详细查看所有版本更新。当前最新版本为 `v1.0.0`。
 
 ### v1.0.0 (Latest)
+
 - **初始发布**：提供完整的便签分类、搜索及代码管理功能。
 - **安装包**：建议下载并解压 `quick-notes-v1.0.0.zip` 进行手动加载。
 
