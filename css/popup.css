@@ -69,6 +69,12 @@ header {
   margin-bottom: 12px;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 h1 {
   font-size: 20px;
   font-weight: bold;
@@ -76,6 +82,24 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.github-link {
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: all 0.1s;
+  padding: 4px;
+  border: 2px solid transparent;
+}
+
+.github-link:hover {
+  color: var(--primary);
+  transform: translate(-1px, -1px);
+}
+
+.github-link:active {
+  transform: translate(1px, 1px);
 }
 
 .settings-toggle {
