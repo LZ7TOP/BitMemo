@@ -35,5 +35,7 @@ window.I18N_ZH = {
   btn_clear: "清空全部",
   confirm_clear_msg: "確定要清空所有便簽嗎？此操作不可撤銷。",
   btn_confirm_clear: "確定清空",
-  context_menu_add: "添加到 像素記"
+  context_menu_add: "添加到 像素記",
+  source_manual: "手動",
+  source_context_menu: "右鍵"
 };

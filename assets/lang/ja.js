@@ -31,5 +31,6 @@ window.I18N_JA = {
   lang_en: "English",
   lang_ja: "日本語",
   lang_ko: "한국어",
-  copy_success: "コピー成功！"
+  copy_success: "コピー成功！",
+  context_menu_add: 'BitMemo に追加'
 };

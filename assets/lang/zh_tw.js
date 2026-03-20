@@ -31,5 +31,6 @@ window.I18N_ZH_TW = {
   lang_en: "English",
   lang_ja: "日本語",
   lang_ko: "한국어",
-  copy_success: "複製成功！"
+  copy_success: "複製成功！",
+  context_menu_add: "添加到 像素記"
 };

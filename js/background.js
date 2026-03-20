@@ -10,6 +10,21 @@ const MENU_LABELS = {
   ko: "BitMemo에 추가"
 };
 
+function detectType(content) {
+  if (!content) return 'text';
+  // URL detection
+  if (/^https?:\/\/[^\s$.?#].[^\s]*$/.test(content.trim())) return 'link';
+  
+  // Simple code detection
+  const codePatterns = [
+    '{', '}', ';', 'function', 'const ', 'let ', 'var ', 'import ', 
+    'def ', 'class ', 'if (', 'for (', 'while (', '=>', 'console.log'
+  ];
+  if (codePatterns.some(p => content.includes(p))) return 'code';
+  
+  return 'text';
+}
+
 // Handle menu creation
 async function updateContextMenu() {
   const settings = await chrome.storage.local.get(SETTINGS_KEY);
@@ -46,21 +61,21 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const notes = data[STORAGE_KEY] || [];
     
     // Auto-detect type
-    const isLink = !!info.linkUrl || (typeof content === 'string' && content.startsWith('http'));
-    const type = isLink ? 'link' : 'text';
+    const type = detectType(content);
 
     const newNote = {
       id: Date.now().toString(),
       type: type,
       title: content.substring(0, 20) + (content.length > 20 ? '...' : ''),
       content: content,
+      source: 'contextMenu',
       time: new Date().toISOString()
     };
 
     notes.unshift(newNote);
     await chrome.storage.local.set({ [STORAGE_KEY]: notes });
     
-    // Optionally: notify user in content script
+    // Notify user in content script
     chrome.tabs.sendMessage(tab.id, { 
       action: 'showToast', 
       message: 'Added to BitMemo / 已添加到像素记' 
@@ -68,7 +83,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   }
 });
 
-// Handle link opening from content script or popup
+// Handle link opening
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'openLink') {
     let url = request.url;
