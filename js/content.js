@@ -142,4 +142,47 @@
   function dragEnd() {
     isDragging = false;
   }
-})();
+// Listen for messages from background
+chrome.runtime.onMessage.addListener((request) => {
+  if (request.action === 'showToast') {
+    showFeedback(request.message);
+  }
+});
+
+function showFeedback(message) {
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a2e;
+    border: 3px solid #ff00ff;
+    color: #ff00ff;
+    padding: 12px 24px;
+    z-index: 100000;
+    box-shadow: 6px 6px 0px #000;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    image-rendering: pixelated;
+    pointer-events: none;
+    animation: pixel-fade 1.5s ease-out forwards;
+  `;
+  toast.textContent = message;
+  
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes pixel-fade {
+      0% { opacity: 0; transform: translate(-50%, -40%); }
+      15% { opacity: 1; transform: translate(-50%, -50%); }
+      85% { opacity: 1; transform: translate(-50%, -50%); }
+      100% { opacity: 0; transform: translate(-50%, -60%); }
+    }
+  `;
+  document.head.appendChild(style);
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.remove();
+    style.remove();
+  }, 1600);
+}
