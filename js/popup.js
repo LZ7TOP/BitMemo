@@ -273,5 +273,19 @@ showWidgetToggle.onchange = async () => {
   });
 };
 
+// Sync Logic: Listen for storage changes to sync across popup and floating panel
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local') {
+    if (changes[STORAGE_KEY]) {
+      notes = changes[STORAGE_KEY].newValue || [];
+      renderNotes();
+    }
+    if (changes[SETTINGS_KEY]) {
+      const settings = changes[SETTINGS_KEY].newValue || { showWidget: true };
+      showWidgetToggle.checked = settings.showWidget;
+    }
+  }
+});
+
 // Start
 init();
