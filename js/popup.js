@@ -22,6 +22,12 @@ const noteTitle = document.getElementById('noteTitle');
 const noteContent = document.getElementById('noteContent');
 const showWidgetToggle = document.getElementById('showWidgetToggle');
 
+// Custom Select Elements
+const customTypeSelect = document.getElementById('customTypeSelect');
+const selectTrigger = customTypeSelect.querySelector('.select-trigger');
+const selectedTypeText = document.getElementById('selectedTypeText');
+const selectOptions = customTypeSelect.querySelectorAll('.select-option');
+
 // Initialize
 async function init() {
   const data = await chrome.storage.local.get([STORAGE_KEY, SETTINGS_KEY]);
@@ -204,7 +210,41 @@ function closeModal() {
   noteContent.value = '';
   editingId = null;
   modalTitle.textContent = '新建便签';
+  updateSelectedType('text'); // Reset to default
+  customTypeSelect.classList.remove('active');
 }
+
+function updateSelectedType(value) {
+  noteType.value = value;
+  const labels = { text: '纯文本', link: '网页链接', code: '代码片段' };
+  selectedTypeText.textContent = labels[value];
+  
+  selectOptions.forEach(opt => {
+    if (opt.dataset.value === value) {
+      opt.classList.add('active');
+    } else {
+      opt.classList.remove('active');
+    }
+  });
+}
+
+// Custom Select Interaction
+selectTrigger.onclick = (e) => {
+  e.stopPropagation();
+  customTypeSelect.classList.toggle('active');
+};
+
+selectOptions.forEach(opt => {
+  opt.onclick = (e) => {
+    e.stopPropagation();
+    updateSelectedType(opt.dataset.value);
+    customTypeSelect.classList.remove('active');
+  };
+});
+
+document.addEventListener('click', () => {
+  customTypeSelect.classList.remove('active');
+});
 
 function editNote(id) {
   const note = notes.find(n => n.id === id);
@@ -212,7 +252,7 @@ function editNote(id) {
 
   editingId = id;
   modalTitle.textContent = '编辑便签';
-  noteType.value = note.type;
+  updateSelectedType(note.type);
   noteTitle.value = note.title;
   noteContent.value = note.content;
   noteModal.classList.add('active');

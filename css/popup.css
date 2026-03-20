@@ -422,7 +422,7 @@ footer {
   margin-bottom: 6px;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input, .form-group textarea {
   width: 100%;
   background: var(--glass);
   border: 3px solid var(--border);
@@ -434,24 +434,74 @@ footer {
   transition: all 0.1s;
 }
 
-.form-group select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+/* Custom Select */
+.custom-select {
+  position: relative;
+  width: 100%;
+  user-select: none;
+}
+
+.select-trigger {
+  background: var(--glass);
+  border: 3px solid var(--border);
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2386868b' stroke-width='4' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  box-shadow: inset 2px 2px 0px rgba(0,0,0,0.3);
+}
+
+.select-arrow {
+  width: 10px;
+  height: 6px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6H0z' fill='black'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 36px;
+  image-rendering: pixelated;
 }
 
 @media (prefers-color-scheme: dark) {
-  .form-group select {
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='4' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  .select-arrow {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6H0z' fill='white'/%3E%3C/svg%3E");
   }
 }
 
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+.select-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--card-bg);
+  border: 3px solid var(--border);
+  border-top: none;
+  z-index: 150;
+  display: none;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.custom-select.active .select-options {
+  display: block;
+}
+
+.select-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.1s;
+}
+
+.select-option:hover {
+  background: var(--primary);
+  color: #000;
+}
+
+.select-option.active {
+  background: var(--glass);
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.form-group input:focus, .form-group textarea:focus {
   border-color: var(--primary);
   background: var(--glass);
   box-shadow: inset 2px 2px 0px rgba(0,0,0,0.5), 0 0 0 2px var(--primary);

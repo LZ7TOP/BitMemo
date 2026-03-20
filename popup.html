@@ -49,12 +49,19 @@
       <div class="modal-content">
         <h2 id="modalTitle">新建便签</h2>
         <div class="form-group">
-          <label for="noteType">类型</label>
-          <select id="noteType">
-            <option value="text">纯文本</option>
-            <option value="link">网页链接</option>
-            <option value="code">代码片段</option>
-          </select>
+          <label>类型</label>
+          <div class="custom-select" id="customTypeSelect">
+            <div class="select-trigger">
+              <span id="selectedTypeText">纯文本</span>
+              <span class="select-arrow"></span>
+            </div>
+            <div class="select-options">
+              <div class="select-option active" data-value="text">纯文本</div>
+              <div class="select-option" data-value="link">网页链接</div>
+              <div class="select-option" data-value="code">代码片段</div>
+            </div>
+          </div>
+          <input type="hidden" id="noteType" value="text">
         </div>
         <div class="form-group">
           <label for="noteTitle">标题</label>
