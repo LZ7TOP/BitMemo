@@ -37,5 +37,6 @@ window.I18N_ZH = {
   btn_confirm_clear: "确定清空",
   context_menu_add: "添加到 像素记",
   source_manual: "手动",
-  source_context_menu: "右键"
+  source_context_menu: "右键",
+  added_successfully: "已添加到 像素记"
 };
