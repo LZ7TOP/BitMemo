@@ -127,10 +127,10 @@ h1 {
   z-index: 200;
   display: none;
   box-shadow: 4px 4px 0px #000;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 
-.lang-selector:hover .lang-options {
+.lang-selector.active .lang-options {
   display: block;
 }
 

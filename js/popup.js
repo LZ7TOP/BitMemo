@@ -242,10 +242,17 @@ function updateSelectedType(value) {
 }
 
 // Language Selector Logic
+langSelector.onclick = (e) => {
+  e.stopPropagation();
+  langSelector.classList.toggle('active');
+  customTypeSelect.classList.remove('active'); // Close other dropdowns
+};
+
 langOptions.forEach(opt => {
   opt.onclick = (e) => {
     e.stopPropagation();
     window.setLanguage(opt.dataset.lang);
+    langSelector.classList.remove('active');
   };
 });
 
@@ -257,6 +264,7 @@ window.addEventListener('langChanged', () => {
 selectTrigger.onclick = (e) => {
   e.stopPropagation();
   customTypeSelect.classList.toggle('active');
+  langSelector.classList.remove('active'); // Close other dropdowns
 };
 
 selectOptions.forEach(opt => {
@@ -269,6 +277,7 @@ selectOptions.forEach(opt => {
 
 document.addEventListener('click', () => {
   customTypeSelect.classList.remove('active');
+  langSelector.classList.remove('active');
 });
 
 function editNote(id) {
