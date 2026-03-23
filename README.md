@@ -1,4 +1,5 @@
 # BitMemo (像素记) 📝
+<!-- Monorepo Sync Test -->
 
 ![Version](https://img.shields.io/badge/version-2.4.2-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
