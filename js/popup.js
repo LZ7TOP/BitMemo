@@ -6,6 +6,7 @@ const SETTINGS_KEY = 'quick_notes_settings_lz7';
 let notes = [];
 let currentTab = 'all';
 let editingId = null;
+let isTypeManuallySelected = false;
 
 // DOM Elements
 const notesList = document.getElementById('notesList');
@@ -76,13 +77,24 @@ function createNoteCard(note) {
   };
   const contentClass = note.type === 'code' ? 'note-content code' : 'note-content';
   
+  let displayContent = escapeHtml(note.content);
+  if (note.type === 'link') {
+    let url = note.content;
+    if (!/^https?:\/\//i.test(url)) {
+      url = 'https://' + url;
+    }
+    displayContent = `<a href="${escapeHtml(url)}" target="_blank" class="note-content-link">🔗 ${escapeHtml(note.content)}</a>`;
+  } else if (note.type === 'text') {
+    displayContent = linkify(escapeHtml(note.content));
+  }
+
   return `
     <div class="note-card" data-id="${note.id}">
       <div class="note-header">
         <div class="note-title">${note.title || (note.type === 'link' ? window.i18n.t('modal_title_add') : window.i18n.t('tab_text'))}</div>
         <div class="note-type-icon">${typeLabels[note.type]}</div>
       </div>
-      <div class="${contentClass}">${escapeHtml(note.content)}</div>
+      <div class="${contentClass}">${displayContent}</div>
       <div class="card-actions">
         ${note.type === 'link' ? `<button class="action-btn open-link" data-url="${escapeHtml(note.content)}">${window.i18n.t('btn_open')}</button>` : ''}
         ${note.type === 'code' ? `<button class="action-btn format" data-id="${note.id}">${window.i18n.t('btn_format')}</button>` : ''}
@@ -257,6 +269,7 @@ function closeModal() {
   modalTitle.textContent = window.i18n.t('modal_title_add');
   updateSelectedType('text'); // Reset to default
   customTypeSelect.classList.remove('active');
+  isTypeManuallySelected = false;
 }
 
 function updateSelectedType(value) {
@@ -308,6 +321,7 @@ selectOptions.forEach(opt => {
     e.stopPropagation();
     updateSelectedType(opt.dataset.value);
     customTypeSelect.classList.remove('active');
+    isTypeManuallySelected = true;
   };
 });
 
@@ -326,14 +340,72 @@ function editNote(id) {
   noteTitle.value = note.title;
   noteContent.value = note.content;
   noteModal.classList.add('active');
+  isTypeManuallySelected = false; // Allow type detection upon user edit
 }
 
 saveBtn.onclick = saveNote;
+
+// Bind noteContent input event for automatic type detection
+noteContent.oninput = () => {
+  if (!isTypeManuallySelected) {
+    const content = noteContent.value.trim();
+    const type = detectType(content);
+    updateSelectedType(type);
+  }
+};
 
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+// Automatically detect the type of note content
+function detectType(content) {
+  if (!content) return 'text';
+
+  // Check if content matches URL format
+  const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/i;
+  if (urlPattern.test(content)) {
+    return 'link';
+  }
+
+  // Check if content is code
+  const lines = content.split('\n');
+  const codeIndicators = [
+    /function\s+\w*\s*\(|const\s+\w+\s*=|let\s+\w+\s*=|import\s+.*\s+from|class\s+\w+|def\s+\w+\(.*\):/,
+    /console\.log\(|System\.out\.println\(|print\(.*\)/,
+    /<\/?[a-z][\s\S]*>/i, // HTML/XML tags
+    /\{[\s\S]*\}/, // Braces
+    /^\s*(if|for|while|switch|return)\b/m,
+    /;\s*$/m // Semicolon ending lines
+  ];
+
+  let score = 0;
+  if (lines.length > 1) {
+    const hasIndent = lines.some(line => line.startsWith('  ') || line.startsWith('\t'));
+    if (hasIndent) score += 2;
+  }
+
+  for (const regex of codeIndicators) {
+    if (regex.test(content)) {
+      score += 2;
+    }
+  }
+
+  if (score >= 2) {
+    return 'code';
+  }
+
+  return 'text';
+}
+
+// Convert plain URLs inside text to clickable links
+function linkify(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.replace(urlRegex, function(url) {
+    return `<a href="${url}" target="_blank" class="text-link">🔗 ${url}</a>`;
+  });
 }
 
 // Settings

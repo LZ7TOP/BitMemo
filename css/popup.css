@@ -379,6 +379,21 @@ main::-webkit-scrollbar-thumb {
   border: 2px solid #333;
 }
 
+.note-content-link, .text-link {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 2px dashed var(--primary);
+  word-break: break-all;
+  display: inline-block;
+  transition: all 0.1s;
+}
+
+.note-content-link:hover, .text-link:hover {
+  color: var(--primary-hover);
+  border-bottom-style: solid;
+}
+
+
 .card-actions {
   display: flex;
   justify-content: flex-end;
