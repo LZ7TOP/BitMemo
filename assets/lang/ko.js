@@ -35,5 +35,8 @@ window.I18N_KO = {
   btn_clear: "모두 삭제",
   context_menu_add: "BitMemo에 추가",
   source_manual: "수동",
-  source_context_menu: "오른쪽 클릭"
+  source_context_menu: "오른쪽 클릭",
+  btn_pin: "고정",
+  btn_unpin: "고정 해제",
+  label_code_lang: "코드 형식"
 };

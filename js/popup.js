@@ -4,6 +4,7 @@ const SETTINGS_KEY = 'quick_notes_settings_lz7';
 
 // Icons
 const LINK_ICON_SVG = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" style="display: inline-block; vertical-align: middle; margin-right: 4px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`;
+const PIN_ICON_SVG = `<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" style="display: inline-block; vertical-align: middle; margin-right: 2px;"><path d="M12 2v8M5 10h14M19 10l-2 5H7l-2-5M12 15v7"/></svg>`;
 
 // State
 let notes = [];
@@ -20,6 +21,8 @@ const noteModal = document.getElementById('noteModal');
 const cancelBtn = document.getElementById('cancelBtn');
 const saveBtn = document.getElementById('saveBtn');
 const modalTitle = document.getElementById('modalTitle');
+const editorWrapper = document.getElementById('editorWrapper');
+const lineNumbers = document.getElementById('lineNumbers');
 
 const noteType = document.getElementById('noteType');
 const noteTitle = document.getElementById('noteTitle');
@@ -36,6 +39,13 @@ const selectTrigger = customTypeSelect.querySelector('.select-trigger');
 const selectedTypeText = document.getElementById('selectedTypeText');
 const selectOptions = customTypeSelect.querySelectorAll('.select-option');
 
+const codeLangGroup = document.getElementById('codeLangGroup');
+const customCodeLangSelect = document.getElementById('customCodeLangSelect');
+const codeLangTrigger = customCodeLangSelect.querySelector('.select-trigger');
+const selectedCodeLangText = document.getElementById('selectedCodeLangText');
+const codeLangOptions = customCodeLangSelect.querySelectorAll('.select-option');
+const codeLangInput = document.getElementById('codeLang');
+
 // Language Selector Elements
 const langSelector = document.getElementById('langSelector');
 const langOptions = document.querySelectorAll('.lang-option');
@@ -51,6 +61,7 @@ async function init() {
   showWidgetToggle.checked = settings.showWidget;
   
   renderNotes();
+  initDragAndDrop();
 }
 
 // Render Notes
@@ -64,8 +75,20 @@ function renderNotes() {
     return matchesTab && matchesSearch;
   });
 
-  notesList.innerHTML = filteredNotes.length > 0 
-    ? filteredNotes.map(note => createNoteCard(note)).join('')
+  // Sort notes: pinned ones first, and maintain original stable indexing order
+  const notesWithIndex = filteredNotes.map((note, index) => ({ note, index }));
+  notesWithIndex.sort((a, b) => {
+    const aPinned = a.note.pinned ? 1 : 0;
+    const bPinned = b.note.pinned ? 1 : 0;
+    if (aPinned !== bPinned) {
+      return bPinned - aPinned;
+    }
+    return a.index - b.index;
+  });
+  const sortedNotes = notesWithIndex.map(item => item.note);
+
+  notesList.innerHTML = sortedNotes.length > 0 
+    ? sortedNotes.map(note => createNoteCard(note)).join('')
     : `<div style="text-align: center; color: var(--text-muted); margin-top: 50px;">${window.i18n.t('no_data')}</div>`;
 
   // Attach event listeners to dynamic elements
@@ -91,19 +114,30 @@ function createNoteCard(note) {
     displayContent = linkify(escapeHtml(note.content));
   }
 
+  const isPinned = !!note.pinned;
+  const pinIndicator = isPinned ? `<span class="pin-indicator">${PIN_ICON_SVG}${window.i18n.t('btn_pin')}</span>` : '';
+  const formattedTime = formatTime(note.timestamp || note.time || new Date().toISOString());
+  const typeLabelText = (note.type === 'code' && note.codeLang) ? note.codeLang : typeLabels[note.type];
+
   return `
-    <div class="note-card" data-id="${note.id}">
+    <div class="note-card${isPinned ? ' pinned' : ''}" data-id="${note.id}" draggable="true">
       <div class="note-header">
-        <div class="note-title">${note.title || (note.type === 'link' ? window.i18n.t('modal_title_add') : window.i18n.t('tab_text'))}</div>
-        <div class="note-type-icon">${typeLabels[note.type]}</div>
+        <div class="note-title">${pinIndicator}${note.title || (note.type === 'link' ? window.i18n.t('modal_title_add') : window.i18n.t('tab_text'))}</div>
+        <div class="note-type-icon ${note.type}">${typeLabelText}</div>
       </div>
       <div class="${contentClass}">${displayContent}</div>
-      <div class="card-actions">
-        ${note.type === 'link' ? `<button class="action-btn open-link" data-url="${escapeHtml(note.content)}">${window.i18n.t('btn_open')}</button>` : ''}
-        ${note.type === 'code' ? `<button class="action-btn format" data-id="${note.id}">${window.i18n.t('btn_format')}</button>` : ''}
-        <button class="action-btn edit" data-id="${note.id}">${window.i18n.t('btn_edit')}</button>
-        <button class="action-btn copy" data-id="${note.id}">${window.i18n.t('btn_copy')}</button>
-        <button class="action-btn delete" data-id="${note.id}">${window.i18n.t('btn_delete')}</button>
+      <div class="note-footer">
+        <div class="note-time">${formattedTime}</div>
+        <div class="card-actions">
+          <button class="action-btn pin-toggle${isPinned ? ' active' : ''}" data-id="${note.id}">
+            ${isPinned ? window.i18n.t('btn_unpin') : window.i18n.t('btn_pin')}
+          </button>
+          ${note.type === 'link' ? `<button class="action-btn open-link" data-url="${escapeHtml(note.content)}">${window.i18n.t('btn_open')}</button>` : ''}
+          ${note.type === 'code' ? `<button class="action-btn format" data-id="${note.id}">${window.i18n.t('btn_format')}</button>` : ''}
+          <button class="action-btn edit" data-id="${note.id}">${window.i18n.t('btn_edit')}</button>
+          <button class="action-btn copy" data-id="${note.id}">${window.i18n.t('btn_copy')}</button>
+          <button class="action-btn delete" data-id="${note.id}">${window.i18n.t('btn_delete')}</button>
+        </div>
       </div>
     </div>
   `;
@@ -123,6 +157,7 @@ async function saveNote() {
 
   if (newNote.type === 'code') {
     newNote.content = formatCode(newNote.content);
+    newNote.codeLang = codeLangInput.value;
   }
 
   if (editingId) {
@@ -245,6 +280,19 @@ function attachCardEvents() {
       chrome.runtime.sendMessage({ action: 'openLink', url: btn.dataset.url });
     };
   });
+
+  document.querySelectorAll('.action-btn.pin-toggle').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      const note = notes.find(n => n.id === id);
+      if (note) {
+        note.pinned = !note.pinned;
+        await chrome.storage.local.set({ [STORAGE_KEY]: notes });
+        renderNotes();
+      }
+    };
+  });
 }
 
 // Tabs
@@ -272,6 +320,8 @@ function closeModal() {
   modalTitle.textContent = window.i18n.t('modal_title_add');
   updateSelectedType('text'); // Reset to default
   customTypeSelect.classList.remove('active');
+  customCodeLangSelect.classList.remove('active');
+  updateSelectedCodeLang('JavaScript');
   isTypeManuallySelected = false;
 }
 
@@ -285,12 +335,18 @@ function updateSelectedType(value) {
   selectedTypeText.textContent = labels[value];
   
   selectOptions.forEach(opt => {
-    if (opt.dataset.value === value) {
-      opt.classList.add('active');
-    } else {
-      opt.classList.remove('active');
-    }
+    opt.classList.toggle('active', opt.dataset.value === value);
   });
+
+  if (value === 'code') {
+    codeLangGroup.style.display = 'block';
+    editorWrapper.classList.add('code-mode');
+    updateLineNumbers();
+  } else {
+    codeLangGroup.style.display = 'none';
+    editorWrapper.classList.remove('code-mode');
+    lineNumbers.innerHTML = '';
+  }
 }
 
 // Language Selector Logic
@@ -316,6 +372,7 @@ window.addEventListener('langChanged', () => {
 selectTrigger.onclick = (e) => {
   e.stopPropagation();
   customTypeSelect.classList.toggle('active');
+  customCodeLangSelect.classList.remove('active');
   langSelector.classList.remove('active'); // Close other dropdowns
 };
 
@@ -328,8 +385,33 @@ selectOptions.forEach(opt => {
   };
 });
 
+// Custom Code Language Selector Interaction
+codeLangTrigger.onclick = (e) => {
+  e.stopPropagation();
+  customCodeLangSelect.classList.toggle('active');
+  customTypeSelect.classList.remove('active');
+  langSelector.classList.remove('active');
+};
+
+codeLangOptions.forEach(opt => {
+  opt.onclick = (e) => {
+    e.stopPropagation();
+    updateSelectedCodeLang(opt.dataset.value);
+    customCodeLangSelect.classList.remove('active');
+  };
+});
+
+function updateSelectedCodeLang(value) {
+  codeLangInput.value = value;
+  selectedCodeLangText.textContent = value;
+  codeLangOptions.forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.value === value);
+  });
+}
+
 document.addEventListener('click', () => {
   customTypeSelect.classList.remove('active');
+  customCodeLangSelect.classList.remove('active');
   langSelector.classList.remove('active');
 });
 
@@ -340,22 +422,74 @@ function editNote(id) {
   editingId = id;
   modalTitle.textContent = window.i18n.t('modal_title_edit');
   updateSelectedType(note.type);
+  if (note.type === 'code') {
+    updateSelectedCodeLang(note.codeLang || 'JavaScript');
+  }
   noteTitle.value = note.title;
   noteContent.value = note.content;
   noteModal.classList.add('active');
   isTypeManuallySelected = false; // Allow type detection upon user edit
+  updateLineNumbers();
 }
 
 saveBtn.onclick = saveNote;
 
-// Bind noteContent input event for automatic type detection
+// Bind noteContent input event for automatic type detection and line numbers update
 noteContent.oninput = () => {
   if (!isTypeManuallySelected) {
     const content = noteContent.value.trim();
     const type = detectType(content);
     updateSelectedType(type);
   }
+  updateLineNumbers();
 };
+
+// Sync scroll between noteContent and lineNumbers
+noteContent.onscroll = () => {
+  lineNumbers.scrollTop = noteContent.scrollTop;
+};
+
+// Editor advanced features: Tab indent and auto-indent inherit
+noteContent.onkeydown = (e) => {
+  if (noteType.value !== 'code') return;
+
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = noteContent.selectionStart;
+    const end = noteContent.selectionEnd;
+    const val = noteContent.value;
+    noteContent.value = val.substring(0, start) + "  " + val.substring(end);
+    noteContent.selectionStart = noteContent.selectionEnd = start + 2;
+    updateLineNumbers();
+  } else if (e.key === 'Enter') {
+    const start = noteContent.selectionStart;
+    const val = noteContent.value;
+    const lastNewLine = val.lastIndexOf('\n', start - 1);
+    const lineStart = lastNewLine === -1 ? 0 : lastNewLine + 1;
+    const currentLine = val.substring(lineStart, start);
+    const indentMatch = currentLine.match(/^\s*/);
+    const indent = indentMatch ? indentMatch[0] : '';
+    
+    if (indent.length > 0) {
+      e.preventDefault();
+      noteContent.value = val.substring(0, start) + "\n" + indent + val.substring(start);
+      noteContent.selectionStart = noteContent.selectionEnd = start + 1 + indent.length;
+      updateLineNumbers();
+    }
+  }
+};
+
+function updateLineNumbers() {
+  if (noteType.value !== 'code') return;
+  const lines = noteContent.value.split('\n');
+  const count = Math.max(1, lines.length);
+  let numbersHtml = '';
+  for (let i = 1; i <= count; i++) {
+    numbersHtml += `<div>${i}</div>`;
+  }
+  lineNumbers.innerHTML = numbersHtml;
+  lineNumbers.scrollTop = noteContent.scrollTop;
+}
 
 function escapeHtml(text) {
   const div = document.createElement('div');
@@ -434,3 +568,82 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 // Start
 init();
+
+// Helper: Format time to YY-MM-DD HH:mm
+function formatTime(isoString) {
+  try {
+    const date = new Date(isoString);
+    const YY = String(date.getFullYear()).slice(-2);
+    const MM = String(date.getMonth() + 1).padStart(2, '0');
+    const DD = String(date.getDate()).padStart(2, '0');
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `${YY}-${MM}-${DD} ${hh}:${mm}`;
+  } catch (e) {
+    return '';
+  }
+}
+
+// Drag & Drop reordering support
+let dragSrcEl = null;
+
+function initDragAndDrop() {
+  notesList.addEventListener('dragstart', (e) => {
+    const card = e.target.closest('.note-card');
+    if (!card) return;
+    dragSrcEl = card;
+    card.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', card.dataset.id);
+  });
+
+  notesList.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const card = e.target.closest('.note-card');
+    if (!card || card === dragSrcEl) return;
+    
+    card.classList.add('drag-over');
+  });
+
+  notesList.addEventListener('dragleave', (e) => {
+    const card = e.target.closest('.note-card');
+    if (card) card.classList.remove('drag-over');
+  });
+
+  notesList.addEventListener('drop', async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const card = e.target.closest('.note-card');
+    if (!card) return;
+    card.classList.remove('drag-over');
+
+    const srcId = e.dataTransfer.getData('text/plain');
+    const targetId = card.dataset.id;
+    if (srcId === targetId) return;
+
+    const srcIndex = notes.findIndex(n => n.id === srcId);
+    const targetIndex = notes.findIndex(n => n.id === targetId);
+
+    if (srcIndex !== -1 && targetIndex !== -1) {
+      const [movedNote] = notes.splice(srcIndex, 1);
+      const targetNote = notes[targetIndex];
+      
+      // Auto-sync pinned attribute if dragged into different zone
+      if (movedNote.pinned !== targetNote.pinned) {
+        movedNote.pinned = targetNote.pinned;
+      }
+
+      notes.splice(targetIndex, 0, movedNote);
+
+      await chrome.storage.local.set({ [STORAGE_KEY]: notes });
+      renderNotes();
+    }
+  });
+
+  notesList.addEventListener('dragend', (e) => {
+    const card = e.target.closest('.note-card');
+    if (card) card.classList.remove('dragging');
+    document.querySelectorAll('.note-card').forEach(c => c.classList.remove('drag-over'));
+  });
+}

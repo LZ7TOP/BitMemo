@@ -37,5 +37,8 @@ window.I18N_EN = {
   btn_confirm_clear: "Clear",
   context_menu_add: "Add to BitMemo",
   source_manual: "Manual",
-  source_context_menu: "Menu"
+  source_context_menu: "Menu",
+  btn_pin: "Pin",
+  btn_unpin: "Unpin",
+  label_code_lang: "Code Format"
 };

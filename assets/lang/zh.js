@@ -38,5 +38,8 @@ window.I18N_ZH = {
   context_menu_add: "添加到 像素记",
   source_manual: "手动",
   source_context_menu: "右键",
-  added_successfully: "已添加到 像素记"
+  added_successfully: "已添加到 像素记",
+  btn_pin: "置顶",
+  btn_unpin: "取消置顶",
+  label_code_lang: "代码格式"
 };

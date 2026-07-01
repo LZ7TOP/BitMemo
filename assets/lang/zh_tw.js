@@ -35,5 +35,8 @@ window.I18N_ZH_TW = {
   btn_clear: "清空全部",
   context_menu_add: "添加到 像素記",
   source_manual: "手動",
-  source_context_menu: "右鍵"
+  source_context_menu: "右鍵",
+  btn_pin: "置頂",
+  btn_unpin: "取消置頂",
+  label_code_lang: "程式碼格式"
 };

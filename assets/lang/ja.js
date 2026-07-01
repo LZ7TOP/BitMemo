@@ -35,5 +35,8 @@ window.I18N_JA = {
   btn_clear: 'すべてクリア',
   context_menu_add: 'BitMemo に追加',
   source_manual: "手動",
-  source_context_menu: "右クリック"
+  source_context_menu: "右クリック",
+  btn_pin: "ピン留め",
+  btn_unpin: "ピン留め解除",
+  label_code_lang: "コード形式"
 };
