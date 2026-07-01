@@ -40,7 +40,7 @@
 
 html, body {
   width: 400px;
-  height: 700px;
+  height: 600px;
   overflow: hidden;
 }
 
@@ -637,7 +637,7 @@ footer {
   width: 100%;
   max-width: 360px;
   box-shadow: 8px 8px 0px #000;
-  max-height: 560px;
+  max-height: 600px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
