@@ -148,6 +148,9 @@ h1 {
 
 .settings-toggle {
   font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .settings-toggle label {
@@ -155,6 +158,53 @@ h1 {
   align-items: center;
   gap: 6px;
   cursor: pointer;
+}
+
+/* Pixel Small Button */
+.pixel-btn-sm {
+  background: var(--glass);
+  border: 3px solid #000;
+  color: var(--text);
+  padding: 0 12px;
+  font-size: 11px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 0px #000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.1s;
+  box-sizing: border-box;
+}
+
+.pixel-btn-sm:hover {
+  background: var(--primary);
+  color: #000;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.pixel-btn-sm:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #000;
+}
+
+.pixel-btn-sm.danger {
+  background: #ff4d4d;
+  color: #fff;
+  border-color: #000;
+}
+
+.pixel-btn-sm.danger:hover {
+  background: #ff1a1a;
+  color: #fff;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px #000;
+}
+
+.pixel-btn-sm.danger:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #000;
 }
 
 .icon-btn.danger {
@@ -239,8 +289,15 @@ input#showWidgetToggle:checked + .pixel-toggle::after {
   border-radius: var(--radius);
 }
 
+.search-box {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
 .search-box input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   background: var(--glass);
   border: 3px solid var(--border);
   padding: 10px 14px;
@@ -328,12 +385,18 @@ main::-webkit-scrollbar-thumb {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  gap: 12px;
 }
 
 .note-title {
   font-weight: 600;
   font-size: 15px;
   color: var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
 }
 
 .note-type-icon {
@@ -343,6 +406,8 @@ main::-webkit-scrollbar-thumb {
   background: var(--glass);
   color: var(--text-muted);
   border: 1px solid #000;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .note-content {

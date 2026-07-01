@@ -143,10 +143,13 @@
     isDragging = false;
   }
 // Listen for messages from background
-chrome.runtime.onMessage.addListener((request) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'showToast') {
     showFeedback(request.message);
+  } else if (request.action === 'getSelectedText') {
+    sendResponse({ text: window.getSelection().toString() });
   }
+  return true;
 });
 
 function showFeedback(message) {

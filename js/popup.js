@@ -2,6 +2,9 @@
 const STORAGE_KEY = 'quick_notes_lz7';
 const SETTINGS_KEY = 'quick_notes_settings_lz7';
 
+// Icons
+const LINK_ICON_SVG = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter" style="display: inline-block; vertical-align: middle; margin-right: 4px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`;
+
 // State
 let notes = [];
 let currentTab = 'all';
@@ -83,7 +86,7 @@ function createNoteCard(note) {
     if (!/^https?:\/\//i.test(url)) {
       url = 'https://' + url;
     }
-    displayContent = `<a href="${escapeHtml(url)}" target="_blank" class="note-content-link">🔗 ${escapeHtml(note.content)}</a>`;
+    displayContent = `<a href="${escapeHtml(url)}" target="_blank" class="note-content-link">${LINK_ICON_SVG}${escapeHtml(note.content)}</a>`;
   } else if (note.type === 'text') {
     displayContent = linkify(escapeHtml(note.content));
   }
@@ -404,7 +407,7 @@ function detectType(content) {
 function linkify(text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return text.replace(urlRegex, function(url) {
-    return `<a href="${url}" target="_blank" class="text-link">🔗 ${url}</a>`;
+    return `<a href="${url}" target="_blank" class="text-link">${LINK_ICON_SVG}${url}</a>`;
   });
 }
 

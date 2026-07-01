@@ -12,9 +12,40 @@ const I18N_BG = {
 
 function detectType(content) {
   if (!content) return 'text';
-  if (/^https?:\/\/[^\s$.?#].[^\s]*$/.test(content.trim())) return 'link';
-  const codePatterns = ['{', '}', ';', 'function', 'const ', 'let ', 'var ', 'import ', 'def ', 'class '];
-  if (codePatterns.some(p => content.includes(p))) return 'code';
+
+  // Check if content matches URL format
+  const urlPattern = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$/i;
+  if (urlPattern.test(content.trim())) {
+    return 'link';
+  }
+
+  // Check if content is code
+  const lines = content.split('\n');
+  const codeIndicators = [
+    /function\s+\w*\s*\(|const\s+\w+\s*=|let\s+\w+\s*=|import\s+.*\s+from|class\s+\w+|def\s+\w+\(.*\):/,
+    /console\.log\(|System\.out\.println\(|print\(.*\)/,
+    /<\/?[a-z][\s\S]*>/i, // HTML/XML tags
+    /\{[\s\S]*\}/, // Braces
+    /^\s*(if|for|while|switch|return)\b/m,
+    /;\s*$/m // Semicolon ending lines
+  ];
+
+  let score = 0;
+  if (lines.length > 1) {
+    const hasIndent = lines.some(line => line.startsWith('  ') || line.startsWith('\t'));
+    if (hasIndent) score += 2;
+  }
+
+  for (const regex of codeIndicators) {
+    if (regex.test(content)) {
+      score += 2;
+    }
+  }
+
+  if (score >= 2) {
+    return 'code';
+  }
+
   return 'text';
 }
 
@@ -41,8 +72,28 @@ chrome.storage.onChanged.addListener((changes) => {
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "add_to_bitmemo") {
-    const content = info.selectionText || info.linkUrl;
+    let content = info.selectionText || info.linkUrl;
     if (!content) return;
+
+    // Try to retrieve selected text with line breaks from content script
+    if (info.selectionText) {
+      try {
+        const response = await new Promise((resolve) => {
+          chrome.tabs.sendMessage(tab.id, { action: 'getSelectedText' }, (res) => {
+            if (chrome.runtime.lastError || !res) {
+              resolve(null);
+            } else {
+              resolve(res.text);
+            }
+          });
+        });
+        if (response) {
+          content = response;
+        }
+      } catch (e) {
+        console.error("Error fetching text with line breaks: ", e);
+      }
+    }
 
     const [data, settings] = await Promise.all([
       chrome.storage.local.get(STORAGE_KEY),
@@ -53,10 +104,14 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     const lang = (settings[SETTINGS_KEY] && settings[SETTINGS_KEY].lang) || 'zh';
     const successMsg = (I18N_BG[lang] || I18N_BG.zh).success;
 
+    // Clean up text display for title (taking first 20 characters of the first line to look neat)
+    const firstLine = content.split('\n')[0].trim();
+    const displayTitle = firstLine.substring(0, 20) + (content.length > 20 || firstLine.length > 20 ? '...' : '');
+
     const newNote = {
       id: Date.now().toString(),
       type: detectType(content),
-      title: content.substring(0, 20) + (content.length > 20 ? '...' : ''),
+      title: displayTitle || (detectType(content) === 'link' ? '未命名链接' : '便签'),
       content: content,
       source: 'contextMenu',
       time: new Date().toISOString()

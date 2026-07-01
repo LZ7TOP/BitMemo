@@ -25,7 +25,7 @@ function applyTranslations() {
     const key = el.getAttribute('data-i18n');
     const translation = t(key);
     
-    if (el.tagName === 'INPUT' && el.getAttribute('placeholder')) {
+    if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.getAttribute('placeholder')) {
       el.placeholder = translation;
     } else {
       el.textContent = translation;
